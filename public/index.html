@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MiniMax Voice Cloner</title>
+</head>
+<body>
+  <h1>🧠 Voice Cloner + Text to Speech</h1>
+
+  <form id="voice-form" enctype="multipart/form-data">
+    <label for="voice">Upload Your Voice (.mp3):</label>
+    <input type="file" id="voice" name="voice" accept="audio/mp3" required />
+    <br><br>
+
+    <label for="text">Enter text to synthesize:</label>
+    <input type="text" id="text" name="text" required />
+    <br><br>
+
+    <button type="submit">Generate Audio</button>
+  </form>
+
+  <h3>Result:</h3>
+  <audio id="audio" controls style="display: none;"></audio>
+
+  <script>
+    document.getElementById('voice-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData();
+      const fileInput = document.getElementById('voice');
+      const textInput = document.getElementById('text');
+
+      formData.append('voice', fileInput.files[0]);
+      formData.append('text', textInput.value);
+
+      const response = await fetch('/api/clone-tts', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audioPlayer = document.getElementById('audio');
+        audioPlayer.src = audioUrl;
+        audioPlayer.style.display = 'block';
+      } else {
+        alert('Something went wrong with voice cloning!');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Voice Cloner</title>
+</head>
+<body>
+  <h2>Upload MP3 & Enter Text</h2>
+  <form id="voiceForm">
+    <input type="file" name="voice" accept=".mp3" required /><br /><br />
+    <textarea name="text" rows="4" cols="40" placeholder="Enter text..." required></textarea><br /><br />
+    <button type="submit">Generate Audio</button>
+  </form>
+
+  <h3>Result:</h3>
+  <audio id="audioPlayer" controls style="display:none;"></audio>
+
+  <script>
+    document.getElementById('voiceForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const form = e.target;
+      const formData = new FormData(form);
+
+      const response = await fetch('http://localhost:5000/api/clone-tts', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const player = document.getElementById('audioPlayer');
+        player.src = audioUrl;
+        player.style.display = 'block';
+      } else {
+        alert('Failed to generate audio');
+      }
+    });
+  </script>
+</body>
+</html>
